@@ -95,3 +95,49 @@ def test_price_setter_returns_none():
 
     assert Product.price.fset(product, 100) is None
     assert product.price == 100
+
+
+@pytest.mark.parametrize(
+    "price, quantity, expected",
+    [
+        (80, 15, "Кабель, 80 руб. Остаток: 15 шт."),
+        (1999.50, 0, "Кабель, 1999.5 руб. Остаток: 0 шт."),
+    ],
+)
+def test_product_string(price, quantity, expected):
+    """Строка товара содержит цену и остаток без перевода строки."""
+    product = Product("Кабель", "USB", price, quantity)
+
+    assert str(product) == expected
+
+
+@pytest.mark.parametrize(
+    "price_a, quantity_a, price_b, quantity_b, expected",
+    [
+        (100, 10, 200, 2, 1400),
+        (10.5, 2, 19.99, 3, 80.97),
+        (100, 0, 200, 2, 400),
+        (100, 0, 200, 0, 0),
+        (0.01, 1, 0.01, 1, 0.02),
+    ],
+)
+def test_addition_returns_combined_stock_value(
+    price_a, quantity_a, price_b, quantity_b, expected
+):
+    """Оператор складывает стоимости запасов, не меняя исходные товары."""
+    first = Product("Первый", "Описание", price_a, quantity_a)
+    second = Product("Второй", "Описание", price_b, quantity_b)
+
+    assert first + second == pytest.approx(expected)
+    assert second + first == pytest.approx(expected)
+    assert (first.price, first.quantity) == (price_a, quantity_a)
+    assert (second.price, second.quantity) == (price_b, quantity_b)
+
+
+def test_product_string_reflects_changes():
+    """Строка товара использует текущую цену и текущий остаток."""
+    product = Product("Кабель", "USB", 80, 15)
+    product.price = 100
+    product.quantity = 0
+
+    assert str(product) == "Кабель, 100 руб. Остаток: 0 шт."

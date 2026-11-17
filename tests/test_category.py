@@ -100,3 +100,28 @@ def test_products_getter_uses_current_values(category, sample_products):
     assert category.products.startswith(
         "Смартфон, 800 руб. Остаток: 0 шт.\n"
     )
+
+
+@pytest.mark.parametrize(
+    "quantities, expected", [([], 0), ([5, 10], 15), ([0, 2], 2)]
+)
+def test_category_string_counts_stock(quantities, expected):
+    """Строка категории считает только ее остатки, не товарные позиции."""
+    products = [
+        Product(f"Товар {index}", "Описание", 80, quantity)
+        for index, quantity in enumerate(quantities)
+    ]
+    category = Category("Техника", "Первая категория", products)
+    Category("Другая", "Чужие товары", [Product("Чужой", "Описание", 1, 999)])
+
+    assert str(category) == f"Техника, количество продуктов: {expected} шт."
+
+
+def test_category_string_reflects_stock_changes(category, sample_products):
+    """Строка обновляется после добавления товара и изменения остатка."""
+    category.add_product(Product("Телевизор", "4K", 123000.0, 7))
+    assert str(category) == "Техника, количество продуктов: 22 шт."
+
+    sample_products[0].quantity = 3
+    assert str(category) == "Техника, количество продуктов: 20 шт."
+    assert Category.product_count == 3
