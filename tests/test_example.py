@@ -8,9 +8,9 @@ from pathlib import Path
 from src.category import Category
 from src.product import Product
 
-EXAMPLE = Path(__file__).parent / "examples" / "14.1_main.py.txt"
+EXAMPLE = Path(__file__).parent / "examples" / "14.2_main.py.txt"
 EXAMPLE_SHA256 = (
-    "c5e572697558de69324d339b8f151e9b2bb01f787469d1c461ac785ce32d87ce"
+    "c57c24aca79980628473d6c793d648b1c3c962d770c7e4cee16154be7d128381"
 )
 
 
@@ -24,10 +24,16 @@ def test_exact_course_example(capsys):
     )
 
     assert namespace["category1"].name == "Смартфоны"
-    assert len(namespace["category1"].products) == 3
-    assert Category.category_count == 2
+    assert Category.category_count == 1
     assert Category.product_count == 4
-    assert capsys.readouterr().out.splitlines()[-2:] == ["2", "4"]
+    assert namespace["new_product"].price == 800
+    assert capsys.readouterr().out.splitlines()[-5:] == [
+        "800",
+        "Цена не должна быть нулевая или отрицательная",
+        "800",
+        "Цена не должна быть нулевая или отрицательная",
+        "800",
+    ]
 
 
 def test_main_keeps_example_behavior():
