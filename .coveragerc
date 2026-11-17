@@ -1,0 +1,11 @@
+[run]
+source = src
+branch = True
+
+[report]
+show_missing = True
+fail_under = 76
+
+[html]
+directory = htmlcov
+title = e-commerce: покрытие тестами
